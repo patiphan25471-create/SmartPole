@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PM2.5 Real-time Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+    <div class="flex flex-col items-center justify-center p-8 bg-white rounded-3xl shadow-2xl w-80 text-center">
+        <h2 class="text-gray-500 text-sm font-bold uppercase tracking-widest mb-4">PM 2.5 ล่าสุด</h2>
+        
+        <div id="pm25-display" class="text-7xl font-black text-slate-800 transition-all duration-500">
+            --
+        </div>
+        
+        <p class="text-gray-400 text-sm mt-2">หน่วย: µg/m³</p>
+
+        <div id="status-msg" class="mt-6 text-xs text-gray-400 italic">
+            กำลังรอข้อมูลจาก n8n...
+        </div>
+    </div>
+
+    <script>
+        async function fetchPM25() {
+            const displayEl = document.getElementById('pm25-display');
+            const statusEl = document.getElementById('status-msg');
+
+            try {
+                // 1. เรียกข้อมูลจาก n8n (ตรวจสอบว่า n8n กด Execute Workflow อยู่)
+                const response = await fetch('http://localhost:5678/webhook/get-pm25');
+                
+                if (!response.ok) throw new Error('เชื่อมต่อ n8n ไม่สำเร็จ (404/500)');
+
+                const data = await response.json();
+                console.log("Data received:", data);
+
+                // 2. ดึงค่า pm25 (รองรับทั้งแบบ Array และ Object)
+                let value;
+                if (Array.isArray(data) && data.length > 0) {
+                    value = data[0].pm25;
+                } else if (data.pm25 !== undefined) {
+                    value = data.pm25;
+                }
+
+                // 3. แสดงผลบนหน้าจอ
+                if (value !== undefined) {
+                    displayEl.innerText = value;
+                    statusEl.innerText = "อัปเดตล่าสุดเมื่อ: " + new Date().toLocaleTimeString();
+                    
+                    // เปลี่ยนสีตามเกณฑ์ฝุ่น
+                    displayEl.className = "text-7xl font-black transition-all duration-500 " + 
+                                         (value > 50 ? "text-red-500" : "text-green-500");
+                } else {
+                    displayEl.innerText = "??";
+                    statusEl.innerText = "พบข้อมูลแต่ไม่มีคอลัมน์ pm25";
+                }
+
+            } catch (error) {
+                console.error("Fetch error:", error);
+                displayEl.innerText = "ERR";
+                statusEl.innerText = "ข้อผิดพลาด: " + error.message;
+            }
+        }
+
+        // รันทันทีที่เปิดหน้าเว็บ
+        fetchPM25();
+
+        // อัปเดตทุก 30 วินาที
+        setInterval(fetchPM25, 30000);
+    </script>
+</body>
+</html>

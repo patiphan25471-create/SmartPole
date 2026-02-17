@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="./dist/output.css" rel="stylesheet">
+    <title>My Website</title>
+  </head>
+
+  <body class="bg-sky-50">
+    <header class="sticky top-0 z-50 w-full h-16 bg-white/80 backdrop-blur-md border-b-1 border-gray-200 flex shadow-lg">
+      <div class="h-full px-10 flex items-center bg-blue-500 text-white shrink-0">
+        My LOGO
+      </div>
+
+      <div class="flex-1"></div>
+
+      <nav class="hidden min-[800px]:flex h-full">
+        <a href="index.html" class="flex items-center bg-blue-500 px-10 justify-center cursor-pointer hover:bg-blue-600 text-white transition">
+          หน้าแรก
+        </a>
+        <a href="list.html" class="flex items-center bg-pink-500 px-10 justify-center cursor-pointer hover:bg-pink-600 text-white transition">
+          รายการ
+        </a>
+        <a href="history.html" class="flex items-center bg-blue-500 px-10 justify-center cursor-pointer underline underline-offset-1 hover:bg-blue-600 text-white transition">
+          ดูข้อมูลย้อนหลัง
+        </a>
+        <a href="predict.html" class="flex items-center bg-pink-500 px-10 justify-center cursor-pointer hover:bg-pink-600 text-white transition">
+          การคาดคะเนฝุ่น
+        </a>
+      </nav>
+
+      <button class="flex min-[800px]:hidden items-center px-6 hover:bg-gray-100 transition" onclick="toggleMenu()">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+      <div id="mobile-menu" class="hidden fixed top-16 left-0 z-40 w-full bg-white border-b border-gray-200 shadow-lg min-[800px]:hidden">
+      <div class="flex flex-col">
+        <a href="index.html" class="p-4 bg-blue-500 text-white border-b border-blue-400">หน้าแรก</a>
+        <a href="list.html" class="p-4 bg-pink-500 text-white border-b border-pink-400">รายการ</a>
+        <a href="history.html" class="p-4 bg-blue-500 text-white border-b border-blue-400">ดูข้อมูลย้อนหลัง</a>
+        <a href="predict.html" class="p-4 bg-pink-500 text-white">การคาดคะเนฝุ่น</a>
+      </div>
+    </div>
+
+    <script>
+      function toggleMenu() {
+        const menu = document.getElementById('mobile-menu');
+        menu.classList.toggle('hidden');
+      }
+    </script>
+    </header>
+    
+    <main>
+     
+    </main>
+
+    <footer>
+
+    </footer>
+    
+  </body>
+</html>

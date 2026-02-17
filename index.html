@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="./dist/output.css" rel="stylesheet">
+    <title>My Website</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@100..700&display=swap" rel="stylesheet">
+    
+    <style>
+      .marker-pin {
+        width: 30px;
+        height: 30px;
+        border-radius: 50% 50% 50% 0;
+        position: absolute;
+        transform: rotate(-45deg);
+        left: 50%;
+        top: 50%;
+        margin: -15px 0 0 -15px;
+        border: 2px solid white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .marker-pin span {
+        transform: rotate(45deg);
+        color: white;
+        font-weight: bold;
+        font-family: sans-serif;
+        font-size: 12px;
+      }
+
+      /* คลาสสำหรับสีต่างๆ */
+      .bg-safe { background-color: #22c55e; }    /* เขียว (Green-500) */
+      .bg-warning { background-color: #eab308; } /* เหลือง (Yellow-500) */
+      .bg-danger { background-color: #ef4444; }  /* แดง (Red-500) */
+
+      
+      body {
+        font-family: "Anuphan", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 400;
+        font-style: normal;
+      }
+      
+    </style>
+
+  </head>
+  <body class="main bg-sky-50">
+    <header class="sticky top-0 z-50 w-full h-16 bg-white/80 backdrop-blur-md border-b-1 border-gray-200 flex shadow-lg">
+      <div class="h-full px-10 flex items-center bg-blue-500 text-white shrink-0">
+        My LOGO
+      </div>
+
+      <div class="flex-1"></div>
+
+      <nav class="hidden min-[800px]:flex h-full">
+        <a href="index.html" class="flex items-center bg-blue-500 px-10 justify-center cursor-pointer underline underline-offset-1 hover:bg-blue-600 text-white transition">
+          หน้าแรก
+        </a>
+        <a href="list.html" class="flex items-center bg-pink-500 px-10 justify-center cursor-pointer hover:bg-pink-600 text-white transition">
+          รายการ
+        </a>
+        <a href="history.html" class="flex items-center bg-blue-500 px-10 justify-center cursor-pointer hover:bg-blue-600 text-white transition">
+          ดูข้อมูลย้อนหลัง
+        </a>
+        <a href="predict.html" class="flex items-center bg-pink-500 px-10 justify-center cursor-pointer hover:bg-pink-600 text-white transition">
+          การคาดคะเนฝุ่น
+        </a>
+      </nav>
+
+      <button class="flex min-[800px]:hidden items-center px-6 hover:bg-gray-100 transition" onclick="toggleMenu()">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+      
+      <div id="mobile-menu" class="hidden fixed top-16 left-0 z-40 w-full bg-white border-b border-gray-200 shadow-lg min-[800px]:hidden">
+      <div class="flex flex-col">
+        <a href="index.html" class="p-4 bg-blue-500 text-white border-b border-blue-400">หน้าแรก</a>
+        <a href="list.html" class="p-4 bg-pink-500 text-white border-b border-pink-400">รายการ</a>
+        <a href="history.html" class="p-4 bg-blue-500 text-white border-b border-blue-400">ดูข้อมูลย้อนหลัง</a>
+        <a href="predict.html" class="p-4 bg-pink-500 text-white">การคาดคะเนฝุ่น</a>
+      </div>
+    </div>
+
+    <script>
+      function toggleMenu() {
+        const menu = document.getElementById('mobile-menu');
+        menu.classList.toggle('hidden');
+      }
+    </script>
+    </header>
+
+    
+
+    
+    <main>
+      <div class="px-7">
+        <div id="map" class=" max-w-250 mx-auto h-[500px] rounded-lg border-2 border-blue-500 justify-center z-0 mt-10   relative shadow-lg/20">
+          <button class="absolute top-2.5 right-2 z-1001 bg-white  rounded-md shadow-md w-17 h-7 border-1 text-sm ">
+          PM2.5
+          </button>
+        </div>
+
+        <script>
+        // 1. ตั้งค่าเริ่มต้นแผนที่
+        var map = L.map('map').setView([14.106070, 100.984210], 15);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Group สำหรับเก็บหมุดเพื่อลบและสร้างใหม่ได้ง่าย
+        var markerGroup = L.layerGroup().addTo(map);
+
+        // 2. ฟังก์ชันเลือกสีหมุดตามค่าฝุ่น
+        function getMarkerColor(val) {
+            if (val <= 25) return 'bg-safe';
+            if (val <= 50) return 'bg-warning';
+            return 'bg-danger';
+        }
+
+        // 3. ฟังก์ชันดึงข้อมูลจาก n8n
+        async function updateData() {
+            const statusEl = document.getElementById('status-msg');
+
+            try {
+                // เปลี่ยน URL นี้ให้ตรงกับ n8n Webhook ของคุณ
+                const response = await fetch('http://localhost:5678/webhook-test/get-pm25');
+                
+                if (!response.ok) throw new Error('ติดต่อ Webhook ไม่ได้');
+
+                const data = await response.json();
+                console.log("Data from Supabase via n8n:", data);
+
+                // ล้างหมุดเก่าออกก่อนปักใหม่
+                markerGroup.clearLayers();
+
+                // รองรับข้อมูลทั้งแบบชิ้นเดียว หรือแบบหลายชิ้น (Array)
+                const items = Array.isArray(data) ? data : [data];
+
+                // --- เริ่มแก้ตั้งแต่บรรทัดนี้ (ในส่วน items.forEach) ---
+                items.forEach(item => {
+                    const val = item.pm25; // ดึงเลข 49 จาก JSON ของคุณ
+                    
+                    // บรรทัดนี้สำคัญ: เพราะ JSON ของคุณไม่มี lat/lng 
+                    // เราเลยต้องกำหนดพิกัดให้มันก่อน (หรือดึงจาก item.lat ถ้าในอนาคตมี)
+                    const lat = item.lat || 14.102328; 
+                    const lng = item.lng || 100.983268;
+
+                    if (val !== undefined) {
+                        const colorClass = getMarkerColor(val);
+
+                        const customIcon = L.divIcon({
+                            className: '',
+                            html: `<div class="marker-pin ${colorClass} transition-all duration-700">
+                                    <span>${val}</span>
+                                  </div>`,
+                            iconSize: [30, 42],
+                            iconAnchor: [15, 42]
+                        });
+
+                        // ปักหมุดโดยใช้ค่า lat, lng ที่เรากำหนดไว้ข้างบน
+                        L.marker([lat, lng], { icon: customIcon })
+                            .addTo(markerGroup)
+                            .bindPopup(`<b>เสา: ${item.pole_id}</b><br>PM2.5: ${val}`);
+                        
+                        // บรรทัดเสริม: สั่งให้แผนที่วิ่งไปหาหมุดอัตโนมัติ
+                        map.panTo([lat, lng]);
+                    }
+                });
+                // --- จบส่วนที่แก้ ---
+
+                statusEl.innerText = "อัปเดตเมื่อ: " + new Date().toLocaleTimeString();
+                statusEl.classList.replace('text-red-500', 'text-blue-600');
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                statusEl.innerText = "Error: เชื่อมต่อ Webhook ไม่สำเร็จ";
+                statusEl.classList.add('text-red-500');
+            }
+        }
+
+        // เริ่มทำงานครั้งแรกทันที
+        updateData();
+
+        // ตั้งเวลาอัปเดตทุก 60 วินาที
+        setInterval(updateData, 60000);
+    </script>
+        
+        <div class="max-w-250 mx-auto mt-5">
+          <div class="flex">
+            <div class="flex flex-1 justify-center">
+              <img src="assets/img/index/face1.png" alt="face1" class="w-12">
+            </div>
+            <div class="flex flex-1 justify-center">
+              <img src="assets/img/index/face2.png" alt="face2" class="w-12">
+            </div>
+            <div class="flex flex-1 justify-center">
+              <img src="assets/img/index/face3.png" alt="face3" class="w-12">
+            </div>
+          </div>
+          <div class="flex mt-2 justify-center h-5">
+            <div class="bg-green-500 flex-1 rounded-l-full">
+              
+            </div>
+          
+            <div class="bg-yellow-500 flex-1">
+              
+            </div>
+          
+            <div class="bg-red-500 flex-1 rounded-r-full">
+              
+            </div>
+          </div>
+          <div class="level">
+            <div class="flex mt-1">
+              <div class="flex-1 text-center">
+                ปลอดภัย
+              </div>
+
+              <div class="flex-1 text-center">
+                เริ่มมีผลกระทบ
+              </div>
+
+              <div class="flex-1 text-center">
+                อันตราย
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <div class="flex mx-auto justify-center bg-green-100 max-w-130 rounded-lg mt-10 p-5 shadow-md border-2 border-black">
+          <div class="flex-1">
+            <div class="px-10 pt-15 text-center">
+              สามารถรรับการแจ้งเตือนฝุ่น PM2.5 ในบริเวณพื้นที่ มศว องครักษ์ได้ผ่านทางไลน์ตรงนี้
+            </div>
+            <a href="https://lin.ee/Ml18Zc1" target="_blank" 
+              class="mx-auto rounded-full bg-green-500 w-40 h-10 mt-5 text-white hover:bg-green-600 cursor-pointer flex items-center justify-center shadow-md transition">
+              กดแอดได้ที่นี่
+            </a>
+          </div>
+          <div class="flex-none">
+            <img src="assets/img/index/pose.png" alt="pose" class="mx-auto w-40 h-65 object-cover"/>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <footer class="bg-stone-950 w-full mt-10">
+      <div class="text-white">
+        footer
+      </div>
+    </footer>
+
+  </body>
+</html>
