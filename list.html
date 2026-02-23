@@ -3,18 +3,51 @@
   <head>
     <link href="./dist/output.css" rel="stylesheet">
     <title>My Website</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@100..700&display=swap" rel="stylesheet">
 
     <style>
+      .marker-pin {
+        width: 30px;
+        height: 30px;
+        border-radius: 50% 50% 50% 0;
+        position: absolute;
+        transform: rotate(-45deg);
+        left: 50%;
+        top: 50%;
+        margin: -15px 0 0 -15px;
+        border: 2px solid white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .marker-pin span {
+        transform: rotate(45deg);
+        color: white;
+        font-weight: bold;
+        font-family: sans-serif;
+        font-size: 12px;
+      }
+
+      /* คลาสสำหรับสีต่างๆ */
+      .bg-safe { background-color: #22c55e; }    /* เขียว (Green-500) */
+      .bg-warning { background-color: #eab308; } /* เหลือง (Yellow-500) */
+      .bg-danger { background-color: #ef4444; }  /* แดง (Red-500) */
+
+      
       body {
         font-family: "Anuphan", sans-serif;
         font-optical-sizing: auto;
         font-weight: 400;
         font-style: normal;
       }
+      
     </style>
   </head>
 
@@ -64,8 +97,124 @@
     </header>
     
     <main>
+      <div class="px-7">
+        <div id="map" class=" max-w-175 mx-auto h-[350px] rounded-lg border-2 border-blue-500 justify-center z-0 mt-10   relative shadow-lg/20">
+          <button class="absolute top-2.5 right-2 z-1001 bg-white  rounded-md shadow-md w-17 h-7 border-1 text-sm ">
+          PM2.5
+          </button>
+        </div>
 
-    </main>
+        <script>
+        // 1. ตั้งค่าเริ่มต้นแผนที่
+        var map = L.map('map').setView([13.692859, 100.412915], 20);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Group สำหรับเก็บหมุด
+        var markerGroup = L.layerGroup().addTo(map);
+
+        // 2. ฟังก์ชันเลือกสีหมุดตามค่าฝุ่น
+        function getMarkerColor(val) {
+            if (val <= 25) return 'bg-safe';
+            if (val <= 50) return 'bg-warning';
+            return 'bg-danger';
+        }
+
+        // 3. ฟังก์ชันดึงข้อมูลและจัดการข้อมูล (เวอร์ชันสมบูรณ์)
+        async function updateData() {
+            const statusEl = document.getElementById('status-msg');
+
+            try {
+                // ดึงข้อมูลจาก Production URL (เปลี่ยนเป็น /webhook/ และกัน Cache)
+                const response = await fetch('http://localhost:5678/webhook/get-pm25?t=' + Date.now());
+                
+                if (!response.ok) throw new Error('ติดต่อ Webhook ไม่สำเร็จ');
+
+                const rawData = await response.json();
+                
+                // --- ส่วนวิเคราะห์ข้อมูล (Debugging) ---
+                console.log("1. ข้อมูลดิบจาก n8n:", rawData);
+
+                // ล้างหมุดเก่า
+                markerGroup.clearLayers();
+
+                // จัดการข้อมูลให้เป็น Array เสมอ ไม่ว่าจะมาท่าไหน
+                let items = [];
+                if (Array.isArray(rawData)) {
+                    items = rawData;
+                } else if (rawData && typeof rawData === 'object') {
+                    // กรณีมาเป็น Object เดียว ให้ห่อด้วย Array
+                    items = [rawData];
+                }
+
+                console.log("2. จำนวนรายการที่ประมวลผล:", items.length);
+
+                // 4. วนลูปสร้างหมุด
+                items.forEach((item, index) => {
+                    const val = item.pm25;
+                    const pid = item.pole_id;
+                    
+                    // กำหนดพิกัดแยกตาม pole_id (ตรวจสอบตัวพิมพ์ใหญ่-เล็กให้ตรงกับ DB)
+                    let lat, lng, label;
+
+                    if (pid === 'Pole-03') {
+                        lat = 13.692829;
+                        lng = 100.413299;
+                        label = "เสาต้นที่ 3 (Pole-03)";
+                    } else if (pid === 'Pole-02') {
+                        lat = 13.692859;
+                        lng = 100.412915;
+                        label = "เสาต้นที่ 2 (Pole-02)";
+                    } else {
+                        // กรณีชื่อไม่ตรง หรือเป็นเสาอื่น ให้วางเหลื่อมกันเพื่อตรวจสอบ
+                        lat = 14.104000 + (index * 0.0015);
+                        lng = 100.984000 + (index * 0.0015);
+                        label = pid || "ไม่ระบุชื่อ";
+                    }
+
+                    if (val !== undefined && lat && lng) {
+                        const colorClass = getMarkerColor(val);
+                        const customIcon = L.divIcon({
+                            className: '',
+                            html: `<div class="marker-pin ${colorClass} transition-all duration-700">
+                                    <span>${val}</span>
+                                  </div>`,
+                            iconSize: [30, 42],
+                            iconAnchor: [15, 42]
+                        });
+
+                        // สร้างหมุดและ Popup
+                        L.marker([lat, lng], { icon: customIcon })
+                            .addTo(markerGroup)
+                            .bindPopup(`<b>${label}</b><br>PM2.5: ${val}`);
+                    }
+                });
+
+                // อัปเดตสถานะ (ถ้ามี)
+                if (statusEl) {
+                    statusEl.innerText = "อัปเดตเมื่อ: " + new Date().toLocaleTimeString() + " (พบ " + items.length + " จุด)";
+                    statusEl.classList.remove('text-red-500');
+                    statusEl.classList.add('text-blue-600');
+                }
+
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    if (statusEl) {
+                        statusEl.innerText = "Error: " + error.message;
+                        statusEl.classList.add('text-red-500');
+                    }
+                }
+            }
+
+            // เริ่มทำงานครั้งแรก
+            updateData();
+
+            // ตั้งเวลาอัปเดตทุก 60 วินาที
+            setInterval(updateData, 60000);
+          </script>
+      </div>
 
     <footer>
 
