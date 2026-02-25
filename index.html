@@ -97,126 +97,100 @@
     </script>
     </header>
 
-    
+  
 
     
     <main>
       <div class="px-7">
         <div id="map" class=" max-w-250 mx-auto h-[500px] rounded-lg border-2 border-blue-500 justify-center z-0 mt-10   relative shadow-lg/20">
-          <button class="absolute top-2.5 right-2 z-1001 bg-white  rounded-md shadow-md w-17 h-7 border-1 text-sm ">
-          PM2.5
-          </button>
+          <div class="absolute top-2 right-2 z-[1000] bg-white px-3 py-1 rounded shadow text-xs font-bold">PM2.5 Real-time</div>
         </div>
 
         <script>
-        // 1. ตั้งค่าเริ่มต้นแผนที่
-        var map = L.map('map').setView([13.692859, 100.412915], 20);
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Group สำหรับเก็บหมุด
+        // 1. ตั้งค่าแผนที่
+        var map = L.map('map').setView([13.692859, 100.412915], 18);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         var markerGroup = L.layerGroup().addTo(map);
 
-        // 2. ฟังก์ชันเลือกสีหมุดตามค่าฝุ่น
         function getMarkerColor(val) {
             if (val <= 25) return 'bg-safe';
             if (val <= 50) return 'bg-warning';
             return 'bg-danger';
         }
 
-        // 3. ฟังก์ชันดึงข้อมูลและจัดการข้อมูล (เวอร์ชันสมบูรณ์)
         async function updateData() {
-            const statusEl = document.getElementById('status-msg');
-
             try {
-                // ดึงข้อมูลจาก Production URL (เปลี่ยนเป็น /webhook/ และกัน Cache)
                 const response = await fetch('http://localhost:5678/webhook/get-pm25?t=' + Date.now());
-                
-                if (!response.ok) throw new Error('ติดต่อ Webhook ไม่สำเร็จ');
-
+                if (!response.ok) throw new Error('Network response was not ok');
                 const rawData = await response.json();
                 
-                // --- ส่วนวิเคราะห์ข้อมูล (Debugging) ---
-                console.log("1. ข้อมูลดิบจาก n8n:", rawData);
+                console.log("Data Received:", rawData);
 
-                // ล้างหมุดเก่า
                 markerGroup.clearLayers();
+                let items = Array.isArray(rawData) ? rawData : [rawData];
 
-                // จัดการข้อมูลให้เป็น Array เสมอ ไม่ว่าจะมาท่าไหน
-                let items = [];
-                if (Array.isArray(rawData)) {
-                    items = rawData;
-                } else if (rawData && typeof rawData === 'object') {
-                    // กรณีมาเป็น Object เดียว ให้ห่อด้วย Array
-                    items = [rawData];
-                }
-
-                console.log("2. จำนวนรายการที่ประมวลผล:", items.length);
-
-                // 4. วนลูปสร้างหมุด
-                items.forEach((item, index) => {
-                    const val = item.pm25;
+                items.forEach((item) => {
                     const pid = item.pole_id;
                     
-                    // กำหนดพิกัดแยกตาม pole_id (ตรวจสอบตัวพิมพ์ใหญ่-เล็กให้ตรงกับ DB)
-                    let lat, lng, label;
+                    // หาเลขท้ายเสา (รองรับทั้ง Pole-02, Pole-2, Pole-03, Pole-3)
+                    let num = "";
+                    if (pid.includes("2")) num = "2";
+                    else if (pid.includes("3")) num = "3";
 
-                    if (pid === 'Pole-03') {
-                        lat = 13.692829;
-                        lng = 100.413299;
-                        label = "เสาต้นที่ 3 (Pole-03)";
-                    } else if (pid === 'Pole-02') {
-                        lat = 13.692859;
-                        lng = 100.412915;
-                        label = "เสาต้นที่ 2 (Pole-02)";
-                    } else {
-                        // กรณีชื่อไม่ตรง หรือเป็นเสาอื่น ให้วางเหลื่อมกันเพื่อตรวจสอบ
-                        lat = 14.104000 + (index * 0.0015);
-                        lng = 100.984000 + (index * 0.0015);
-                        label = pid || "ไม่ระบุชื่อ";
+                    // --- อัปเดตตัวเลขใน Dashboard ---
+                    if (num !== "") {
+                        const sensorMap = {
+                            [`pm25-pole${num}`]: item.pm25,
+                            [`pm10-pole${num}`]: item.pm10,
+                            [`co2-pole${num}`]: item.co2,
+                            [`tvoc-pole${num}`]: item.tvoc,
+                            [`ch2o-pole${num}`]: item.ch2o,
+                            [`temp-pole${num}`]: item.temp,
+                            [`hum-pole${num}`]: item.hum
+                        };
+
+                        for (const [id, value] of Object.entries(sensorMap)) {
+                            const el = document.getElementById(id);
+                            if (el) {
+                                el.innerText = (value !== undefined && value !== null) ? value : '--';
+                                
+                                // ใส่สีเฉพาะ PM 2.5
+                                if (id.startsWith('pm25-') && value !== undefined) {
+                                    if (value <= 25) el.className = "text-2xl font-black text-green-500";
+                                    else if (value <= 50) el.className = "text-2xl font-black text-yellow-500";
+                                    else el.className = "text-2xl font-black text-red-500";
+                                }
+                            }
+                        }
                     }
 
-                    if (val !== undefined && lat && lng) {
-                        const colorClass = getMarkerColor(val);
+                    // --- วางหมุดบนแผนที่ ---
+                    let lat, lng, label;
+                    if (pid.includes("3")) {
+                        lat = 13.692829; lng = 100.413299; label = "ริมรั้ว (Pole-03)";
+                    } else if (pid.includes("2")) {
+                        lat = 13.692859; lng = 100.412915; label = "สนาม (Pole-02)";
+                    }
+
+                    if (item.pm25 !== undefined && lat && lng) {
+                        const colorClass = getMarkerColor(item.pm25);
                         const customIcon = L.divIcon({
                             className: '',
-                            html: `<div class="marker-pin ${colorClass} transition-all duration-700">
-                                    <span>${val}</span>
-                                  </div>`,
+                            html: `<div class="marker-pin ${colorClass}"><span>${item.pm25}</span></div>`,
                             iconSize: [30, 42],
                             iconAnchor: [15, 42]
                         });
-
-                        // สร้างหมุดและ Popup
-                        L.marker([lat, lng], { icon: customIcon })
-                            .addTo(markerGroup)
-                            .bindPopup(`<b>${label}</b><br>PM2.5: ${val}`);
+                        L.marker([lat, lng], { icon: customIcon }).addTo(markerGroup).bindPopup(`<b>${label}</b><br>PM2.5: ${item.pm25}`);
                     }
                 });
 
-                // อัปเดตสถานะ (ถ้ามี)
-                if (statusEl) {
-                    statusEl.innerText = "อัปเดตเมื่อ: " + new Date().toLocaleTimeString() + " (พบ " + items.length + " จุด)";
-                    statusEl.classList.remove('text-red-500');
-                    statusEl.classList.add('text-blue-600');
-                }
-
             } catch (error) {
                 console.error("Fetch Error:", error);
-                if (statusEl) {
-                    statusEl.innerText = "Error: " + error.message;
-                    statusEl.classList.add('text-red-500');
-                }
             }
         }
 
-        // เริ่มทำงานครั้งแรก
         updateData();
-
-        // ตั้งเวลาอัปเดตทุก 60 วินาที
-        setInterval(updateData, 60000);
+        setInterval(updateData, 1800000); // อัปเดตทุก 30 นาที
     </script>
         
         <div class="max-w-250 mx-auto mt-5">

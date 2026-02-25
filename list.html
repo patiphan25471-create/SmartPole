@@ -35,45 +35,29 @@
         font-size: 12px;
       }
 
-      /* คลาสสำหรับสีต่างๆ */
-      .bg-safe { background-color: #22c55e; }    /* เขียว (Green-500) */
-      .bg-warning { background-color: #eab308; } /* เหลือง (Yellow-500) */
-      .bg-danger { background-color: #ef4444; }  /* แดง (Red-500) */
+      .bg-safe { background-color: #22c55e; } 
+      .bg-warning { background-color: #eab308; } 
+      .bg-danger { background-color: #ef4444; } 
 
-      
       body {
         font-family: "Anuphan", sans-serif;
         font-optical-sizing: auto;
         font-weight: 400;
         font-style: normal;
       }
-      
     </style>
   </head>
 
   <body class="bg-sky-50">
-    <header class="sticky top-0 z-50 w-full h-16 bg-white/80 backdrop-blur-md border-b-2 border-gray-400 flex shadow-lg">
-      <div class="h-full px-10 flex items-center shrink-0">
-        My LOGO
-      </div>
-
+    <header class="sticky top-0 z-1001 w-full h-16 bg-white/80 backdrop-blur-md border-b-2 border-gray-400 flex shadow-lg">
+      <div class="h-full px-10 flex items-center shrink-0"> My LOGO </div>
       <div class="flex-1"></div>
-
       <nav class="hidden min-[800px]:flex h-full">
-        <a href="index.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">
-          หน้าแรก
-        </a>
-        <a href="list.html" class="flex items-center px-10 justify-center cursor-pointer underline underline-offset-1 hover:bg-gray-300 transition ">
-          รายการ
-        </a>
-        <a href="history.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300  transition">
-          ดูข้อมูลย้อนหลัง
-        </a>
-        <a href="predict.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">
-          เกี่ยวกับเรา
-        </a>
+        <a href="index.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">หน้าแรก</a>
+        <a href="list.html" class="flex items-center px-10 justify-center cursor-pointer underline underline-offset-1 hover:bg-gray-300 transition ">รายการ</a>
+        <a href="history.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">ดูข้อมูลย้อนหลัง</a>
+        <a href="predict.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">เกี่ยวกับเรา</a>
       </nav>
-
       <button class="flex min-[800px]:hidden items-center px-6 hover:bg-gray-100 transition" onclick="toggleMenu()">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
@@ -87,137 +71,177 @@
           <a href="predict.html" class="p-4 hover:bg-gray-200 transition">เกี่ยวกับเรา</a>
         </div>
       </div>
-
-    <script>
-      function toggleMenu() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-      }
-    </script>
     </header>
     
-    <main>
-      <div class="px-7">
-        <div id="map" class=" max-w-175 mx-auto h-[350px] rounded-lg border-2 border-blue-500 justify-center z-0 mt-10   relative shadow-lg/20">
-          <button class="absolute top-2.5 right-2 z-1001 bg-white  rounded-md shadow-md w-17 h-7 border-1 text-sm ">
-          PM2.5
-          </button>
+    <main class="p-7">
+        <div id="map" class="max-w-4xl mx-auto h-[400px] rounded-xl border-2 border-blue-400 shadow-xl relative overflow-hidden">
+            <div class="absolute top-2 right-2 z-[1000] bg-white px-3 py-1 rounded shadow text-xs font-bold">PM2.5 Real-time</div>
         </div>
 
-        <script>
-        // 1. ตั้งค่าเริ่มต้นแผนที่
-        var map = L.map('map').setView([13.692859, 100.412915], 20);
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+        <div class="max-w-4xl mx-auto mt-10">
+            <h2 class="text-xl font-bold mb-5 text-gray-700">📍 สถานะเซนเซอร์แยกตามพื้นที่</h2>
 
-        // Group สำหรับเก็บหมุด
+            <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-blue-500 mb-6 transition-all hover:shadow-lg">
+                <div class="flex items-center mb-4">
+                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold mr-3">Pole-02</span>
+                    <h3 class="font-bold text-lg text-gray-800">บริเวณสนาม</h3>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">PM 2.5</div>
+                        <div id="pm25-pole2" class="text-2xl font-black text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">PM 10</div>
+                        <div id="pm10-pole2" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">CO2</div>
+                        <div id="co2-pole2" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">TVOC</div>
+                        <div id="tvoc-pole2" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">CH2O</div>
+                        <div id="ch2o-pole2" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">Temp</div>
+                        <div id="temp-pole2" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">Hum</div>
+                        <div id="hum-pole2" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-green-500 mb-6 transition-all hover:shadow-lg">
+                <div class="flex items-center mb-4">
+                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold mr-3">Pole-03</span>
+                    <h3 class="font-bold text-lg text-gray-800">บริเวณริมรั้ว</h3>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">PM 2.5</div>
+                        <div id="pm25-pole3" class="text-2xl font-black text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">PM 10</div>
+                        <div id="pm10-pole3" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">CO2</div>
+                        <div id="co2-pole3" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">TVOC</div>
+                        <div id="tvoc-pole3" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">CH2O</div>
+                        <div id="ch2o-pole3" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">Temp</div>
+                        <div id="temp-pole3" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">Hum</div>
+                        <div id="hum-pole3" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 1. ตั้งค่าแผนที่
+        var map = L.map('map').setView([13.692859, 100.412915], 18);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         var markerGroup = L.layerGroup().addTo(map);
 
-        // 2. ฟังก์ชันเลือกสีหมุดตามค่าฝุ่น
         function getMarkerColor(val) {
             if (val <= 25) return 'bg-safe';
             if (val <= 50) return 'bg-warning';
             return 'bg-danger';
         }
 
-        // 3. ฟังก์ชันดึงข้อมูลและจัดการข้อมูล (เวอร์ชันสมบูรณ์)
         async function updateData() {
-            const statusEl = document.getElementById('status-msg');
-
             try {
-                // ดึงข้อมูลจาก Production URL (เปลี่ยนเป็น /webhook/ และกัน Cache)
                 const response = await fetch('http://localhost:5678/webhook/get-pm25?t=' + Date.now());
-                
-                if (!response.ok) throw new Error('ติดต่อ Webhook ไม่สำเร็จ');
-
+                if (!response.ok) throw new Error('Network response was not ok');
                 const rawData = await response.json();
                 
-                // --- ส่วนวิเคราะห์ข้อมูล (Debugging) ---
-                console.log("1. ข้อมูลดิบจาก n8n:", rawData);
+                console.log("Data Received:", rawData);
 
-                // ล้างหมุดเก่า
                 markerGroup.clearLayers();
+                let items = Array.isArray(rawData) ? rawData : [rawData];
 
-                // จัดการข้อมูลให้เป็น Array เสมอ ไม่ว่าจะมาท่าไหน
-                let items = [];
-                if (Array.isArray(rawData)) {
-                    items = rawData;
-                } else if (rawData && typeof rawData === 'object') {
-                    // กรณีมาเป็น Object เดียว ให้ห่อด้วย Array
-                    items = [rawData];
-                }
-
-                console.log("2. จำนวนรายการที่ประมวลผล:", items.length);
-
-                // 4. วนลูปสร้างหมุด
-                items.forEach((item, index) => {
-                    const val = item.pm25;
+                items.forEach((item) => {
                     const pid = item.pole_id;
                     
-                    // กำหนดพิกัดแยกตาม pole_id (ตรวจสอบตัวพิมพ์ใหญ่-เล็กให้ตรงกับ DB)
-                    let lat, lng, label;
+                    // หาเลขท้ายเสา (รองรับทั้ง Pole-02, Pole-2, Pole-03, Pole-3)
+                    let num = "";
+                    if (pid.includes("2")) num = "2";
+                    else if (pid.includes("3")) num = "3";
 
-                    if (pid === 'Pole-03') {
-                        lat = 13.692829;
-                        lng = 100.413299;
-                        label = "เสาต้นที่ 3 (Pole-03)";
-                    } else if (pid === 'Pole-02') {
-                        lat = 13.692859;
-                        lng = 100.412915;
-                        label = "เสาต้นที่ 2 (Pole-02)";
-                    } else {
-                        // กรณีชื่อไม่ตรง หรือเป็นเสาอื่น ให้วางเหลื่อมกันเพื่อตรวจสอบ
-                        lat = 14.104000 + (index * 0.0015);
-                        lng = 100.984000 + (index * 0.0015);
-                        label = pid || "ไม่ระบุชื่อ";
+                    // --- อัปเดตตัวเลขใน Dashboard ---
+                    if (num !== "") {
+                        const sensorMap = {
+                            [`pm25-pole${num}`]: item.pm25,
+                            [`pm10-pole${num}`]: item.pm10,
+                            [`co2-pole${num}`]: item.co2,
+                            [`tvoc-pole${num}`]: item.tvoc,
+                            [`ch2o-pole${num}`]: item.ch2o,
+                            [`temp-pole${num}`]: item.temp,
+                            [`hum-pole${num}`]: item.hum
+                        };
+
+                        for (const [id, value] of Object.entries(sensorMap)) {
+                            const el = document.getElementById(id);
+                            if (el) {
+                                el.innerText = (value !== undefined && value !== null) ? value : '--';
+                                
+                                // ใส่สีเฉพาะ PM 2.5
+                                if (id.startsWith('pm25-') && value !== undefined) {
+                                    if (value <= 25) el.className = "text-2xl font-black text-green-500";
+                                    else if (value <= 50) el.className = "text-2xl font-black text-yellow-500";
+                                    else el.className = "text-2xl font-black text-red-500";
+                                }
+                            }
+                        }
                     }
 
-                    if (val !== undefined && lat && lng) {
-                        const colorClass = getMarkerColor(val);
+                    // --- วางหมุดบนแผนที่ ---
+                    let lat, lng, label;
+                    if (pid.includes("3")) {
+                        lat = 13.692829; lng = 100.413299; label = "ริมรั้ว (Pole-03)";
+                    } else if (pid.includes("2")) {
+                        lat = 13.692859; lng = 100.412915; label = "สนาม (Pole-02)";
+                    }
+
+                    if (item.pm25 !== undefined && lat && lng) {
+                        const colorClass = getMarkerColor(item.pm25);
                         const customIcon = L.divIcon({
                             className: '',
-                            html: `<div class="marker-pin ${colorClass} transition-all duration-700">
-                                    <span>${val}</span>
-                                  </div>`,
+                            html: `<div class="marker-pin ${colorClass}"><span>${item.pm25}</span></div>`,
                             iconSize: [30, 42],
                             iconAnchor: [15, 42]
                         });
-
-                        // สร้างหมุดและ Popup
-                        L.marker([lat, lng], { icon: customIcon })
-                            .addTo(markerGroup)
-                            .bindPopup(`<b>${label}</b><br>PM2.5: ${val}`);
+                        L.marker([lat, lng], { icon: customIcon }).addTo(markerGroup).bindPopup(`<b>${label}</b><br>PM2.5: ${item.pm25}`);
                     }
                 });
 
-                // อัปเดตสถานะ (ถ้ามี)
-                if (statusEl) {
-                    statusEl.innerText = "อัปเดตเมื่อ: " + new Date().toLocaleTimeString() + " (พบ " + items.length + " จุด)";
-                    statusEl.classList.remove('text-red-500');
-                    statusEl.classList.add('text-blue-600');
-                }
-
-                } catch (error) {
-                    console.error("Fetch Error:", error);
-                    if (statusEl) {
-                        statusEl.innerText = "Error: " + error.message;
-                        statusEl.classList.add('text-red-500');
-                    }
-                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
             }
+        }
 
-            // เริ่มทำงานครั้งแรก
-            updateData();
-
-            // ตั้งเวลาอัปเดตทุก 60 วินาที
-            setInterval(updateData, 60000);
-          </script>
-      </div>
-
-    <footer>
-
-    </footer>
-  </body>
+        updateData();
+        setInterval(updateData, 1800000); // อัปเดตทุก 30 นาที
+    </script>
+</body>
 </html>
