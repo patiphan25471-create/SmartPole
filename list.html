@@ -81,6 +81,43 @@
         <div class="max-w-4xl mx-auto mt-10">
             <h2 class="text-xl font-bold mb-5 text-gray-700">📍 สถานะเซนเซอร์แยกตามพื้นที่</h2>
 
+            <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-red-500 mb-6 transition-all hover:shadow-lg">
+                <div class="flex items-center mb-4">
+                    <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-bold mr-3">Pole-01</span>
+                    <h3 class="font-bold text-lg text-gray-800">บริเวณตึกภาคเครื่องกล</h3>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">PM 2.5</div>
+                        <div id="pm25-pole1" class="text-2xl font-black text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">PM 10</div>
+                        <div id="pm10-pole1" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">CO2</div>
+                        <div id="co2-pole1" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">TVOC</div>
+                        <div id="tvoc-pole1" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">CH2O</div>
+                        <div id="ch2o-pole1" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">Temp</div>
+                        <div id="temp-pole1" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                    <div class="p-2 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-500 uppercase">Hum</div>
+                        <div id="hum-pole1" class="text-2xl font-bold text-gray-700">--</div>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-blue-500 mb-6 transition-all hover:shadow-lg">
                 <div class="flex items-center mb-4">
                     <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold mr-3">Pole-02</span>
@@ -185,7 +222,8 @@
                     
                     // หาเลขท้ายเสา (รองรับทั้ง Pole-02, Pole-2, Pole-03, Pole-3)
                     let num = "";
-                    if (pid.includes("2")) num = "2";
+                    if (pid.includes("1")) num = "1";
+                    else if (pid.includes("2")) num = "2";
                     else if (pid.includes("3")) num = "3";
 
                     // --- อัปเดตตัวเลขใน Dashboard ---
@@ -221,6 +259,8 @@
                         lat = 13.692829; lng = 100.413299; label = "ริมรั้ว (Pole-03)";
                     } else if (pid.includes("2")) {
                         lat = 13.692859; lng = 100.412915; label = "สนาม (Pole-02)";
+                    } else if (pid.includes("1")) {
+                        lat = 13.792859; lng = 100.512915; label = "สนาม (Pole-01)";
                     }
 
                     if (item.pm25 !== undefined && lat && lng) {

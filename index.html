@@ -106,7 +106,74 @@
           <div class="absolute top-2 right-2 z-[1000] bg-white px-3 py-1 rounded shadow text-xs font-bold">PM2.5 Real-time</div>
         </div>
 
-        <script>
+        
+        <div class="max-w-250 mx-auto mt-5">
+          <div class="flex">
+            <div class="flex flex-1 justify-center">
+              <img src="assets/img/index/face1.png" alt="face1" class="w-12">
+            </div>
+            <div class="flex flex-1 justify-center">
+              <img src="assets/img/index/face2.png" alt="face2" class="w-12">
+            </div>
+            <div class="flex flex-1 justify-center">
+              <img src="assets/img/index/face3.png" alt="face3" class="w-12">
+            </div>
+          </div>
+          <div class="flex mt-2 justify-center h-5">
+            <div class="bg-green-500 flex-1 rounded-l-full">
+              
+            </div>
+          
+            <div class="bg-yellow-500 flex-1">
+              
+            </div>
+          
+            <div class="bg-red-500 flex-1 rounded-r-full">
+              
+            </div>
+          </div>
+          <div class="level">
+            <div class="flex mt-1">
+              <div class="flex-1 text-center">
+                ปลอดภัย
+              </div>
+
+              <div class="flex-1 text-center">
+                เริ่มมีผลกระทบ
+              </div>
+
+              <div class="flex-1 text-center">
+                อันตราย
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <div class="flex mx-auto justify-center bg-green-100 max-w-130 rounded-lg mt-10 p-5 shadow-md border-2 border-black">
+          <div class="flex-1">
+            <div class="px-10 pt-15 text-center">
+              สามารถรรับการแจ้งเตือนฝุ่น PM2.5 ในบริเวณพื้นที่ มศว องครักษ์ได้ผ่านทางไลน์ตรงนี้
+            </div>
+            <a href="https://lin.ee/Ml18Zc1" target="_blank" 
+              class="mx-auto rounded-full bg-green-500 w-40 h-10 mt-5 text-white hover:bg-green-600 cursor-pointer flex items-center justify-center shadow-md transition">
+              กดแอดได้ที่นี่
+            </a>
+          </div>
+          <div class="flex-none">
+            <img src="assets/img/index/pose.png" alt="pose" class="mx-auto w-40 h-65 object-cover"/>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <footer class="bg-stone-950 w-full mt-10">
+      <div class="text-white">
+        footer
+      </div>
+    </footer>
+
+     <script>
         // 1. ตั้งค่าแผนที่
         var map = L.map('map').setView([13.692859, 100.412915], 18);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
@@ -192,72 +259,6 @@
         updateData();
         setInterval(updateData, 1800000); // อัปเดตทุก 30 นาที
     </script>
-        
-        <div class="max-w-250 mx-auto mt-5">
-          <div class="flex">
-            <div class="flex flex-1 justify-center">
-              <img src="assets/img/index/face1.png" alt="face1" class="w-12">
-            </div>
-            <div class="flex flex-1 justify-center">
-              <img src="assets/img/index/face2.png" alt="face2" class="w-12">
-            </div>
-            <div class="flex flex-1 justify-center">
-              <img src="assets/img/index/face3.png" alt="face3" class="w-12">
-            </div>
-          </div>
-          <div class="flex mt-2 justify-center h-5">
-            <div class="bg-green-500 flex-1 rounded-l-full">
-              
-            </div>
-          
-            <div class="bg-yellow-500 flex-1">
-              
-            </div>
-          
-            <div class="bg-red-500 flex-1 rounded-r-full">
-              
-            </div>
-          </div>
-          <div class="level">
-            <div class="flex mt-1">
-              <div class="flex-1 text-center">
-                ปลอดภัย
-              </div>
-
-              <div class="flex-1 text-center">
-                เริ่มมีผลกระทบ
-              </div>
-
-              <div class="flex-1 text-center">
-                อันตราย
-              </div>
-            </div>
-          </div>
-        </div>  
-
-        <div class="flex mx-auto justify-center bg-green-100 max-w-130 rounded-lg mt-10 p-5 shadow-md border-2 border-black">
-          <div class="flex-1">
-            <div class="px-10 pt-15 text-center">
-              สามารถรรับการแจ้งเตือนฝุ่น PM2.5 ในบริเวณพื้นที่ มศว องครักษ์ได้ผ่านทางไลน์ตรงนี้
-            </div>
-            <a href="https://lin.ee/Ml18Zc1" target="_blank" 
-              class="mx-auto rounded-full bg-green-500 w-40 h-10 mt-5 text-white hover:bg-green-600 cursor-pointer flex items-center justify-center shadow-md transition">
-              กดแอดได้ที่นี่
-            </a>
-          </div>
-          <div class="flex-none">
-            <img src="assets/img/index/pose.png" alt="pose" class="mx-auto w-40 h-65 object-cover"/>
-          </div>
-        </div>
-
-      </div>
-    </main>
-
-    <footer class="bg-stone-950 w-full mt-10">
-      <div class="text-white">
-        footer
-      </div>
-    </footer>
 
   </body>
 </html>
