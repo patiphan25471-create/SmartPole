@@ -121,7 +121,7 @@
             <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-blue-500 mb-6 transition-all hover:shadow-lg">
                 <div class="flex items-center mb-4">
                     <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold mr-3">Pole-02</span>
-                    <h3 class="font-bold text-lg text-gray-800">บริเวณสนาม</h3>
+                    <h3 class="font-bold text-lg text-gray-800">บริเวณสนามบ้านบางแค</h3>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
                     <div class="p-2 bg-gray-50 rounded-lg">
@@ -158,7 +158,7 @@
             <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-green-500 mb-6 transition-all hover:shadow-lg">
                 <div class="flex items-center mb-4">
                     <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold mr-3">Pole-03</span>
-                    <h3 class="font-bold text-lg text-gray-800">บริเวณริมรั้ว</h3>
+                    <h3 class="font-bold text-lg text-gray-800">บริเวณริมรั้วบ้านบางแค</h3>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
                     <div class="p-2 bg-gray-50 rounded-lg">
@@ -196,7 +196,7 @@
 
     <script>
         // 1. ตั้งค่าแผนที่
-        var map = L.map('map').setView([13.692859, 100.412915], 18);
+        var map = L.map('map').setView([13.932015, 100.821451], 9);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         var markerGroup = L.layerGroup().addTo(map);
 
@@ -260,7 +260,7 @@
                     } else if (pid.includes("2")) {
                         lat = 13.692859; lng = 100.412915; label = "สนาม (Pole-02)";
                     } else if (pid.includes("1")) {
-                        lat = 13.792859; lng = 100.512915; label = "สนาม (Pole-01)";
+                        lat = 14.102262; lng = 100.983474; label = "บริเวณตึกภาคเครื่องกล (Pole-01)";
                     }
 
                     if (item.pm25 !== undefined && lat && lng) {
