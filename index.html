@@ -52,7 +52,7 @@
 
   </head>
   <body class="main bg-sky-50">
-    <header class="sticky top-0 z-50 w-full h-16 bg-white/80 backdrop-blur-md border-b-2 border-gray-400 flex shadow-lg">
+    <header class="sticky top-0 z-1001 w-full h-16 bg-white/80 backdrop-blur-md border-b-2 border-gray-400 flex shadow-lg">
       <div class="h-full px-10 flex items-center shrink-0">
         My LOGO
       </div>
@@ -100,10 +100,18 @@
   
 
     
-    <main>
-      <div class="px-7">
-        <div id="map" class=" max-w-250 mx-auto h-[500px] rounded-lg border-2 border-blue-500 justify-center z-0 mt-10   relative shadow-lg/20">
-          <div class="absolute top-2 right-2 z-[1000] bg-white px-3 py-1 rounded shadow text-xs font-bold">PM2.5 Real-time</div>
+    <main class="p-7">
+      <div id="map" class="max-w-4xl mx-auto h-[400px] rounded-xl border-2 border-blue-400 shadow-xl relative overflow-hidden">
+            <div class="absolute top-2 right-2 z-[1000] flex flex-col items-end gap-1">
+                <div class="bg-white px-3 py-1 rounded shadow text-[10px] font-bold text-gray-500 flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    อัปเดตล่าสุด: <span id="last-update">--:--:--</span>
+                </div>
+                <div class="bg-white px-3 py-1 rounded shadow text-[10px] font-black text-blue-600 uppercase">PM2.5 Real-time</div>
+            </div>
         </div>
 
         
@@ -192,7 +200,14 @@
                 const rawData = await response.json();
                 
                 console.log("Data Received:", rawData);
-
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('th-TH', { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+        document.getElementById('last-update').innerText = timeString;
+                
                 markerGroup.clearLayers();
                 let items = Array.isArray(rawData) ? rawData : [rawData];
 

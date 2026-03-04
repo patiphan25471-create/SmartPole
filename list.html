@@ -75,7 +75,16 @@
     
     <main class="p-7">
         <div id="map" class="max-w-4xl mx-auto h-[400px] rounded-xl border-2 border-blue-400 shadow-xl relative overflow-hidden">
-            <div class="absolute top-2 right-2 z-[1000] bg-white px-3 py-1 rounded shadow text-xs font-bold">PM2.5 Real-time</div>
+            <div class="absolute top-2 right-2 z-[1000] flex flex-col items-end gap-1">
+                <div class="bg-white px-3 py-1 rounded shadow text-[10px] font-bold text-gray-500 flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    อัปเดตล่าสุด: <span id="last-update">--:--:--</span>
+                </div>
+                <div class="bg-white px-3 py-1 rounded shadow text-[10px] font-black text-blue-600 uppercase">PM2.5 Real-time</div>
+            </div>
         </div>
 
         <div class="max-w-4xl mx-auto mt-10">
@@ -213,7 +222,14 @@
                 const rawData = await response.json();
                 
                 console.log("Data Received:", rawData);
-
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('th-TH', { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit' 
+                });
+        document.getElementById('last-update').innerText = timeString;
+                
                 markerGroup.clearLayers();
                 let items = Array.isArray(rawData) ? rawData : [rawData];
 
