@@ -119,6 +119,7 @@
     <script>
         function toggleMenu() {
             const menu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
         }
 
@@ -139,7 +140,13 @@
             for (let i = 0; i < parseInt(range); i++) {
                 const d = new Date();
                 d.setDate(today.getDate() - i);
-                const dateValue = d.toISOString().split('T')[0];
+                
+                // ใช้การดึงวันที่แบบท้องถิ่น YYYY-MM-DD เพื่อใช้เป็น Value ในการ Filter
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const dateValue = `${year}-${month}-${day}`;
+                
                 const thaiLabel = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
                 
                 const option = document.createElement('option');
@@ -151,7 +158,7 @@
 
         let myChart = null;
 
-       async function updateHistory() {
+        async function updateHistory() {
             const pole = document.getElementById('poleSelect').value;
             const range = document.getElementById('rangeSelect').value;
             const selectedDate = document.getElementById('dateSelect').value;
@@ -163,10 +170,8 @@
             }
 
             try {
-                // 1. สร้าง URL โดยตรวจสอบเงื่อนไขวันที่ให้ละเอียดขึ้น
                 let url = `http://localhost:5678/webhook/get-history?pole=${pole}&days=${range}`;
                 
-                // ถ้าเลือกช่วงวัน (7, 30) และเลือกวันที่เจาะจง (ที่ไม่ใช่ all)
                 if (range !== "1" && selectedDate !== "all") {
                     url += `&date=${selectedDate}`;
                 }
@@ -176,26 +181,24 @@
 
                 if (!data || data.length === 0) {
                     alert("ไม่พบข้อมูลในช่วงเวลาดังกล่าว");
-                    resetStats();
                     return;
                 }
 
-                // 2. กรองข้อมูลฝั่ง Client อีกชั้นเพื่อความชัวร์ (กรณี n8n ส่งมาเกิน)
+                // --- แก้ไขการ Filter: ใช้ 10 ตัวแรกของสตริง (YYYY-MM-DD) เพื่อให้วันที่แม่นยำ ---
                 let filteredData = data;
                 if (range !== "1" && selectedDate !== "all") {
                     filteredData = data.filter(item => {
-                        const itemDate = new Date(item.created_at).toISOString().split('T')[0];
+                        const itemDate = item.created_at.substring(0, 10); 
                         return itemDate === selectedDate;
                     });
                 }
 
                 if (filteredData.length === 0) {
                     alert("ไม่พบข้อมูลในวันที่เลือก");
-                    resetStats();
                     return;
                 }
 
-                // 3. คำนวณค่าทางสถิติ
+                // คำนวณค่าทางสถิติ (Design เดิม)
                 const pmValues = filteredData.map(item => Number(item.pm25 || item.PM25 || 0));
                 const max = Math.max(...pmValues);
                 const min = Math.min(...pmValues);
@@ -205,7 +208,6 @@
                 document.getElementById('max-val').innerText = max;
                 document.getElementById('min-val').innerText = min;
 
-                // 4. วาดกราฟโดยส่งข้อมูลที่กรองแล้วเข้าไป
                 renderChart(filteredData, pole, range, selectedDate);
 
             } catch (error) {
@@ -223,30 +225,37 @@
             const ctx = document.getElementById('chartHistory').getContext('2d');
             if (myChart) myChart.destroy();
 
-            // เรียงลำดับข้อมูลตามเวลา (จากเก่าไปใหม่) เพื่อให้เส้นกราฟไม่พันกัน
-            data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            // เรียงลำดับข้อมูลตามเวลา (จากเก่าไปใหม่)
+            data.sort((a, b) => a.created_at.localeCompare(b.created_at));
 
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.map(item => {
-                        const date = new Date(item.created_at);
-                        const time = date.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+                        // --- แก้ไข Label: ดึงเลขจาก String ตรงๆ ไม่ผ่าน Date Object เพื่อป้องกันการบวก 7 ชม. ---
+                        const rawStr = item.created_at; 
+                        const timePart = rawStr.includes('T') 
+                                        ? rawStr.split('T')[1].substring(0, 5) 
+                                        : rawStr.split(' ')[1].substring(0, 5);
                         
-                        // ถ้าดูรายวัน ให้โชว์แค่เวลา ถ้าดูหลายวันรวมกัน ให้โชว์วันที่ด้วย
-                        return (selectedDate === "all" && range !== "1") 
-                            ? `${date.getDate()} ${date.toLocaleDateString('th-TH', {month:'short'})} ${time}` 
-                            : time;
+                        if (selectedDate === "all" && range !== "1") {
+                            // ถ้าดูหลายวัน ให้โชว์วันที่ด้วย (ดึงจาก String 8-10 คือวัน, 5-7 คือเดือน)
+                            const day = parseInt(rawStr.substring(8, 10));
+                            const monthIndex = parseInt(rawStr.substring(5, 7)) - 1;
+                            const monthName = new Date(2000, monthIndex).toLocaleDateString('th-TH', {month:'short'});
+                            return `${day} ${monthName} ${timePart}`;
+                        }
+                        return timePart;
                     }),
                     datasets: [{
                         label: `PM2.5 (${pole})`,
                         data: data.map(item => Number(item.pm25 || item.PM25 || 0)),
-                        borderColor: '#2563eb',
+                        borderColor: '#2563eb', // สีน้ำเงินเดิม
                         backgroundColor: 'rgba(37, 99, 235, 0.1)',
                         borderWidth: 3,
                         fill: true,
-                        tension: 0.4,
-                        pointRadius: data.length > 50 ? 0 : 4, // ถ้าข้อมูลเยอะไปให้ซ่อนจุด
+                        tension: 0.4, // ความโค้งมนเดิม
+                        pointRadius: data.length > 50 ? 0 : 4,
                         pointHoverRadius: 6
                     }]
                 },
@@ -281,6 +290,9 @@
                 }
             });
         }
+
+        // เรียกใช้งานครั้งแรก
+        window.onload = updateDateOptions;
     </script>
 </body>
 </html>
