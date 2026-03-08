@@ -1,69 +1,76 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
     <link href="./dist/output.css" rel="stylesheet">
-    <title>My Website</title>
+    <title>AirforSWU - วิเคราะห์ข้อมูลย้อนหลัง</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@100..700&display=swap" rel="stylesheet">
 
     <style>
-      body {
-        font-family: "Anuphan", sans-serif;
-        font-optical-sizing: auto;
-        font-weight: 400;
-        font-style: normal;
-      }
+        body {
+            font-family: "Anuphan", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+        }
     </style>
-  </head>
+</head>
 
-  <body class="bg-sky-50">
-    <header class="sticky top-0 z-50 w-full h-16 bg-white/80 backdrop-blur-md border-b-2 border-gray-400 flex shadow-lg">
-      <div class="h-full px-10 flex items-center shrink-0">
-        My LOGO
-      </div>
-
-      <div class="flex-1"></div>
-
-      <nav class="hidden min-[800px]:flex h-full">
-        <a href="index.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">หน้าแรก</a>
-        <a href="list.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">รายการ</a>
-        <a href="history.html" class="flex items-center px-10 justify-center cursor-pointer underline underline-offset-1 hover:bg-gray-300 transition">ดูข้อมูลย้อนหลัง</a>
-        <a href="predict.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">เกี่ยวกับเรา</a>
-      </nav>
-
-      <button class="flex min-[800px]:hidden items-center px-6 hover:bg-gray-100 transition" onclick="toggleMenu()">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-        </svg>
-      </button>
-      <div id="mobile-menu" class="hidden fixed top-16 left-0 z-40 w-full bg-white border-b-2 border-gray-400 shadow-lg min-[800px]:hidden">
-        <div class="flex flex-col">
-          <a href="index.html" class="p-4 hover:bg-gray-200 transition">หน้าแรก</a>
-          <a href="list.html" class="p-4 hover:bg-gray-200 transition">รายการ</a>
-          <a href="history.html" class="p-4 hover:bg-gray-200 transition">ดูข้อมูลย้อนหลัง</a>
-          <a href="predict.html" class="p-4 hover:bg-gray-200 transition">เกี่ยวกับเรา</a>
+<body class="bg-sky-50">
+    <header class="sticky top-0 z-[1001] w-full h-16 bg-white/80 backdrop-blur-md border-b-2 border-gray-400 flex items-center justify-between px-6 shadow-lg">
+        <div class="flex items-center gap-2 h-full">
+            <div class="font-bold text-xl text-slate-800 shrink-0 pl-4 md:pl-10">AirforSWU</div>
+            <img src="assets/img/Srinakharinwirot_Logo/Srinakharinwirot_Logo_TH_Color.png" alt="logo" class="h-10 w-10 object-contain">
         </div>
-      </div>
+
+        <nav class="hidden min-[820px]:flex h-full items-center">
+            <a href="index.html" class="px-6 h-full flex items-center hover:bg-gray-300 transition">หน้าแรก</a>
+            <a href="list.html" class="px-6 h-full flex items-center hover:bg-gray-300 transition">รายการ</a>
+            <a href="history.html" class="px-6 h-full flex items-center hover:bg-gray-300 underline underline-offset-1 transition font-bold">ดูข้อมูลย้อนหลัง</a>
+            <a href="predict.html" class="px-6 h-full flex items-center hover:bg-gray-300 transition">เกี่ยวกับเรา</a>
+        </nav>
+
+        <button class="flex min-[820px]:hidden items-center px-6" onclick="toggleMenu()">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+        
+        <div id="mobile-menu" class="hidden fixed top-16 left-0 z-[1001] w-full bg-white border-b-2 border-gray-400 shadow-lg">
+            <div class="flex flex-col">
+                <a href="index.html" class="p-4 hover:bg-gray-200">หน้าแรก</a>
+                <a href="list.html" class="p-4 hover:bg-gray-200">รายการ</a>
+                <a href="history.html" class="p-4 hover:bg-gray-200 bg-gray-100">ดูข้อมูลย้อนหลัง</a>
+                <a href="predict.html" class="p-4 hover:bg-gray-200">เกี่ยวกับเรา</a>
+            </div>
+        </div>
     </header>
     
-    <main class="max-w-6xl mx-auto p-6 md:p-10">
+    <main class="max-w-6xl mx-auto p-7 md:p-10">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <h1 class="text-2xl font-black text-slate-800">📊 วิเคราะห์ข้อมูลย้อนหลัง</h1>
             
             <div class="flex flex-wrap gap-3">
                 <select id="poleSelect" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 shadow-sm outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="Pole1">Pole-01 (ตำแหน่ง 1)</option>
+                    <option value="Pole1">Pole-01 (ตึกภาคเครื่องกล)</option>
                     <option value="Pole2">Pole-02 (สนาม)</option>
                     <option value="Pole3">Pole-03 (ริมรั้ว)</option>
                 </select>
-                <select id="rangeSelect" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 shadow-sm outline-none focus:ring-2 focus:ring-blue-500">
+                
+                <select id="rangeSelect" onchange="updateDateOptions()" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 shadow-sm outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="1">24 ชั่วโมงล่าสุด</option>
                     <option value="7" selected>7 วันล่าสุด</option>
                     <option value="30">30 วันล่าสุด</option>
                 </select>
-                <button onclick="updateHistory()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all active:scale-95">
+                
+                <select id="dateSelect" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 shadow-sm outline-none focus:ring-2 focus:ring-blue-500 hidden">
+                    <option value="all">ดูทุกวันรวมกัน</option>
+                </select>
+
+                <button id="submitBtn" onclick="updateHistory()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all active:scale-95">
                     เรียกดูข้อมูล
                 </button>
             </div>
@@ -115,34 +122,81 @@
             menu.classList.toggle('hidden');
         }
 
+        function updateDateOptions() {
+            const range = document.getElementById('rangeSelect').value;
+            const dateSelect = document.getElementById('dateSelect');
+            
+            if (range === "1") {
+                dateSelect.classList.add('hidden');
+                dateSelect.value = "all";
+                return;
+            }
+            
+            dateSelect.classList.remove('hidden');
+            dateSelect.innerHTML = '<option value="all">ดูทุกวันรวมกัน</option>';
+            
+            const today = new Date();
+            for (let i = 0; i < parseInt(range); i++) {
+                const d = new Date();
+                d.setDate(today.getDate() - i);
+                const dateValue = d.toISOString().split('T')[0];
+                const thaiLabel = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
+                
+                const option = document.createElement('option');
+                option.value = dateValue;
+                option.text = thaiLabel;
+                dateSelect.appendChild(option);
+            }
+        }
+
         let myChart = null;
 
-        async function updateHistory() {
+       async function updateHistory() {
             const pole = document.getElementById('poleSelect').value;
-            const days = document.getElementById('rangeSelect').value;
-            const btn = document.querySelector('button');
+            const range = document.getElementById('rangeSelect').value;
+            const selectedDate = document.getElementById('dateSelect').value;
+            const btn = document.getElementById('submitBtn');
 
-            btn.innerText = "กำลังโหลด...";
-            btn.disabled = true;
+            if (btn) {
+                btn.innerText = "กำลังโหลด...";
+                btn.disabled = true;
+            }
 
             try {
-                // แก้ไข URL: ส่งค่า pole และ days ไปยัง n8n Webhook
-                const url = `http://localhost:5678/webhook/get-history?pole=${pole}&days=${days}`;
+                // 1. สร้าง URL โดยตรวจสอบเงื่อนไขวันที่ให้ละเอียดขึ้น
+                let url = `http://localhost:5678/webhook/get-history?pole=${pole}&days=${range}`;
+                
+                // ถ้าเลือกช่วงวัน (7, 30) และเลือกวันที่เจาะจง (ที่ไม่ใช่ all)
+                if (range !== "1" && selectedDate !== "all") {
+                    url += `&date=${selectedDate}`;
+                }
+
                 const response = await fetch(url);
                 const data = await response.json();
 
                 if (!data || data.length === 0) {
                     alert("ไม่พบข้อมูลในช่วงเวลาดังกล่าว");
-                    // ล้างค่าเก่าออกถ้าไม่เจอข้อมูล
-                    document.getElementById('avg-val').innerText = "--";
-                    document.getElementById('max-val').innerText = "--";
-                    document.getElementById('min-val').innerText = "--";
-                    if (myChart) myChart.destroy();
+                    resetStats();
                     return;
                 }
 
-                // 1. ประมวลผลข้อมูลสถิติ (รองรับทั้ง pm25 และ PM25)
-                const pmValues = data.map(item => Number(item.pm25 || item.PM25 || 0));
+                // 2. กรองข้อมูลฝั่ง Client อีกชั้นเพื่อความชัวร์ (กรณี n8n ส่งมาเกิน)
+                let filteredData = data;
+                if (range !== "1" && selectedDate !== "all") {
+                    filteredData = data.filter(item => {
+                        const itemDate = new Date(item.created_at).toISOString().split('T')[0];
+                        return itemDate === selectedDate;
+                    });
+                }
+
+                if (filteredData.length === 0) {
+                    alert("ไม่พบข้อมูลในวันที่เลือก");
+                    resetStats();
+                    return;
+                }
+
+                // 3. คำนวณค่าทางสถิติ
+                const pmValues = filteredData.map(item => Number(item.pm25 || item.PM25 || 0));
                 const max = Math.max(...pmValues);
                 const min = Math.min(...pmValues);
                 const avg = (pmValues.reduce((a, b) => a + b, 0) / pmValues.length).toFixed(1);
@@ -151,58 +205,82 @@
                 document.getElementById('max-val').innerText = max;
                 document.getElementById('min-val').innerText = min;
 
-                // 2. จัดการกราฟ
-                const ctx = document.getElementById('chartHistory').getContext('2d');
-                if (myChart) myChart.destroy();
+                // 4. วาดกราฟโดยส่งข้อมูลที่กรองแล้วเข้าไป
+                renderChart(filteredData, pole, range, selectedDate);
 
-                myChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: data.map(item => {
-                            const date = new Date(item.created_at);
-                            return date.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + 
-                                   (days > 1 ? ` (${date.getDate()} ${date.toLocaleDateString('th-TH', {month:'short'})})` : '');
-                        }),
-                        datasets: [{
-                            label: `PM2.5 (${pole})`,
-                            data: pmValues,
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: data.length > 100 ? 0 : 3,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: { intersect: false, mode: 'index' },
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { 
-                                beginAtZero: true,
-                                grid: { color: '#f1f5f9' },
-                                title: { display: true, text: 'µg/m³' }
-                            },
-                            x: { 
-                                grid: { display: false },
-                                ticks: { maxRotation: 45, minRotation: 45 }
-                            }
-                        }
-                    }
-                });
             } catch (error) {
                 console.error("Fetch Error:", error);
-                alert("ไม่สามารถดึงข้อมูลจาก Server ได้ (ตรวจสอบว่า n8n เปิดอยู่หรือไม่)");
+                alert("ไม่สามารถดึงข้อมูลจาก Server ได้");
             } finally {
-                btn.innerText = "เรียกดูข้อมูล";
-                btn.disabled = false;
+                if (btn) {
+                    btn.innerText = "เรียกดูข้อมูล";
+                    btn.disabled = false;
+                }
             }
         }
 
-        window.onload = updateHistory;
+        function renderChart(data, pole, range, selectedDate) {
+            const ctx = document.getElementById('chartHistory').getContext('2d');
+            if (myChart) myChart.destroy();
+
+            // เรียงลำดับข้อมูลตามเวลา (จากเก่าไปใหม่) เพื่อให้เส้นกราฟไม่พันกัน
+            data.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => {
+                        const date = new Date(item.created_at);
+                        const time = date.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+                        
+                        // ถ้าดูรายวัน ให้โชว์แค่เวลา ถ้าดูหลายวันรวมกัน ให้โชว์วันที่ด้วย
+                        return (selectedDate === "all" && range !== "1") 
+                            ? `${date.getDate()} ${date.toLocaleDateString('th-TH', {month:'short'})} ${time}` 
+                            : time;
+                    }),
+                    datasets: [{
+                        label: `PM2.5 (${pole})`,
+                        data: data.map(item => Number(item.pm25 || item.PM25 || 0)),
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: data.length > 50 ? 0 : 4, // ถ้าข้อมูลเยอะไปให้ซ่อนจุด
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index',
+                    },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` PM2.5: ${context.parsed.y} µg/m³`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            title: { display: true, text: 'ค่าฝุ่น (µg/m³)', font: { weight: 'bold' } },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { maxRotation: 45, font: { size: 10 } } 
+                        }
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>

@@ -49,21 +49,39 @@
   </head>
 
   <body class="bg-sky-50">
-    <header class="sticky top-0 z-1001 w-full h-16 bg-white/80 backdrop-blur-md border-b-2 border-gray-400 flex shadow-lg">
-      <div class="h-full px-10 flex items-center shrink-0"> My LOGO </div>
+   <header class="sticky top-0 z-1001 w-full h-16 bg-white/80 backdrop-blur-md border-b-2 border-gray-400 flex shadow-lg">
+      <div class="flex">
+        <div class="h-full pl-10 flex items-center shrink-0 font-bold text-xl ">
+          AirforSWU
+        </div>
+        <div class="flex items-center px-1">
+          <img src="assets/img/Srinakharinwirot_Logo/Srinakharinwirot_Logo_TH_Color.png" alt="logo" class="h-10 w-10 object-cover">
+        </div>
+      </div>
       <div class="flex-1"></div>
-      <nav class="hidden min-[800px]:flex h-full">
-        <a href="index.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">หน้าแรก</a>
-        <a href="list.html" class="flex items-center px-10 justify-center cursor-pointer underline underline-offset-1 hover:bg-gray-300 transition ">รายการ</a>
-        <a href="history.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">ดูข้อมูลย้อนหลัง</a>
-        <a href="predict.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">เกี่ยวกับเรา</a>
+
+      <nav class="hidden min-[820px]:flex h-full">
+        <a href="index.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">
+          หน้าแรก
+        </a>
+        <a href="list.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 underline underline-offset-1 transition ">
+          รายการ
+        </a>
+        <a href="history.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">
+          ดูข้อมูลย้อนหลัง
+        </a>
+        <a href="predict.html" class="flex items-center px-10 justify-center cursor-pointer hover:bg-gray-300 transition">
+          เกี่ยวกับเรา
+        </a>
       </nav>
-      <button class="flex min-[800px]:hidden items-center px-6 hover:bg-gray-100 transition" onclick="toggleMenu()">
+
+      <button class="flex min-[820px]:hidden items-center px-6 hover:bg-gray-100 transition" onclick="toggleMenu()">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
         </svg>
       </button>
-      <div id="mobile-menu" class="hidden fixed top-16 left-0 z-40 w-full bg-white border-b-2 border-gray-400 shadow-lg min-[800px]:hidden">
+      
+      <div id="mobile-menu" class="hidden fixed top-16 left-0 z-40 w-full bg-white border-b-2 border-gray-400 shadow-lg min-[820px]:hidden">
         <div class="flex flex-col">
           <a href="index.html" class="p-4 hover:bg-gray-200 transition">หน้าแรก</a>
           <a href="list.html" class="p-4 hover:bg-gray-200 transition">รายการ</a>
@@ -71,6 +89,13 @@
           <a href="predict.html" class="p-4 hover:bg-gray-200 transition">เกี่ยวกับเรา</a>
         </div>
       </div>
+
+    <script>
+      function toggleMenu() {
+        const menu = document.getElementById('mobile-menu');
+        menu.classList.toggle('hidden');
+      }
+    </script>
     </header>
     
     <main class="p-7">
@@ -88,9 +113,12 @@
         </div>
 
         <div class="max-w-4xl mx-auto mt-10">
-            <h2 class="text-xl font-bold mb-5 text-gray-700">📍 สถานะเซนเซอร์แยกตามพื้นที่</h2>
-
-            <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-red-500 mb-6 transition-all hover:shadow-lg">
+            <div class="flex">
+                <div class="flex items-center text-xl font-bold mb-5 text-gray-700">📍 สถานะเซนเซอร์แยกตามพื้นที่ </div>
+                <div class="flex-1"></div>
+                <div onclick="resetToDefault()" class="flex text-white items-center text-xl font-bold mb-5 cursor-pointer bg-sky-400 hover:bg-sky-300 py-2 px-4 rounded border border-black">กลับสู่ตำแหน่งเริ่มต้น</div>
+            </div>
+            <div onclick="zoomToPole('1')" class="bg-white p-6 rounded-xl shadow-md border-l-8 border-red-500 mb-6 transition-all hover:shadow-lg cursor-pointer">
                 <div class="flex items-center mb-4">
                     <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-bold mr-3">Pole-01</span>
                     <h3 class="font-bold text-lg text-gray-800">บริเวณตึกภาคเครื่องกล</h3>
@@ -127,7 +155,7 @@
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-blue-500 mb-6 transition-all hover:shadow-lg">
+            <div onclick="zoomToPole('2')" class="bg-white p-6 rounded-xl shadow-md border-l-8 border-blue-500 mb-6 transition-all hover:shadow-lg cursor-pointer">
                 <div class="flex items-center mb-4">
                     <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold mr-3">Pole-02</span>
                     <h3 class="font-bold text-lg text-gray-800">บริเวณสนามบ้านบางแค</h3>
@@ -164,7 +192,7 @@
                 </div>
             </div>
 
-            <div class="bg-white p-6 rounded-xl shadow-md border-l-8 border-green-500 mb-6 transition-all hover:shadow-lg">
+            <div onclick="zoomToPole('3')" class="bg-white p-6 rounded-xl shadow-md border-l-8 border-green-500 mb-6 transition-all hover:shadow-lg cursor-pointer">
                 <div class="flex items-center mb-4">
                     <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold mr-3">Pole-03</span>
                     <h3 class="font-bold text-lg text-gray-800">บริเวณริมรั้วบ้านบางแค</h3>
@@ -204,6 +232,54 @@
     </main>
 
     <script>
+        // --- 1. สร้างตัวแปรเก็บพิกัดเสาไว้ด้านบนสุดของ script ---
+        const poleLocations = {
+            "1": { lat: 14.102262, lng: 100.983474, label: "ตึกภาคเครื่องกล" },
+            "2": { lat: 13.692859, lng: 100.412915, label: "สนามบ้านบางแค" },
+            "3": { lat: 13.692829, lng: 100.413299, label: "ริมรั้วบ้านบางแค" }
+        };
+        const defaultView = {
+            coords: [13.932015, 100.821451],
+            zoom: 9
+        };
+
+        function resetToDefault() {
+            // สั่งให้หน้าจอเลื่อนกลับขึ้นไปที่แผนที่ก่อน (ถ้าอยู่ด้านล่าง)
+            document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // สั่งให้แผนที่บินกลับไปจุดเริ่มต้น
+            map.flyTo(defaultView.coords, defaultView.zoom, {
+                animate: true,
+                duration: 1.5 // ปรับความเร็วตามชอบ (วินาที)
+            });
+
+            // ปิด Popup ที่อาจค้างอยู่
+            map.closePopup();
+        }
+
+        // --- 2. ฟังก์ชันสำหรับสั่งให้ Map ซูมไปที่พิกัด ---
+        function zoomToPole(poleNum) {
+        const loc = poleLocations[poleNum];
+        if (loc) {
+            // 1. เลื่อนหน้าจอกลับขึ้นมาที่แผนที่แบบนุ่มนวล (Smooth Scroll)
+            const mapElement = document.getElementById('map');
+            mapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // 2. สั่งให้แผนที่ร่อนไปหาพิกัด (flyTo)
+            map.flyTo([loc.lat, loc.lng], 18, {
+                animate: true,
+                duration: 1.5
+            });
+            
+            // 3. แสดง Popup (ถ้าต้องการ)
+            setTimeout(() => {
+                L.popup()
+                    .setLatLng([loc.lat, loc.lng])
+                    .setContent(`<b>${loc.label}</b>`)
+                    .openOn(map);
+            }, 1500);
+        }
+    }
         // 1. ตั้งค่าแผนที่
         var map = L.map('map').setView([13.932015, 100.821451], 9);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
