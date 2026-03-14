@@ -46,6 +46,23 @@
         font-weight: 400;
         font-style: normal;
       }
+      /* การปรับแต่งสำหรับหน้าจอเล็ก (Mobile Optimized) */
+    @media (max-width: 525px) {
+        /* 1. ลดระยะขอบด้านข้างของเนื้อหาหลัก */
+        main.p-7 {
+            padding: 1rem !important; /* ลดจาก 1.75rem เหลือ 1rem */
+        }
+
+        
+
+        /* 3. ปรับปุ่ม Reset ให้เล็กลงและประหยัดพื้นที่ */
+        div[onclick="resetToDefault()"] {
+            font-size: 0.75rem !important;
+            padding: 0.5rem 0.75rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+
+       
     </style>
   </head>
 
