@@ -239,7 +239,7 @@
 
         async function updateData() {
             try {
-                const response = await fetch(' https://patiphan25471.app.n8n.cloud/webhook/get-pm25?t=' + Date.now());
+                const response = await fetch(' https://patiphan25472.app.n8n.cloud/webhook/get-pm25?t=' + Date.now());
                 if (!response.ok) throw new Error('Network response was not ok');
                 const rawData = await response.json();
                 
