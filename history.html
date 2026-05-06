@@ -61,8 +61,6 @@
           <a href="About_us.html" class="p-4 hover:bg-gray-100 transition">เกี่ยวกับเรา</a>
         </div>
       </div>
-
-    
     </header>
     
     <main class="max-w-6xl mx-auto p-7 md:p-10">
@@ -116,12 +114,23 @@
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-            <div class="flex items-center justify-between mb-6">
+        <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100 mb-8">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <h2 class="font-bold text-slate-700 flex items-center gap-2">
                     <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
                     กราฟแสดงแนวโน้มค่าฝุ่น
                 </h2>
+                <div class="flex flex-wrap gap-3 text-xs">
+                    <span class="flex items-center gap-1.5 px-3 py-1 bg-green-100 text-green-800 rounded-full font-medium">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span> ปลอดภัย (0-24)
+                    </span>
+                    <span class="flex items-center gap-1.5 px-3 py-1 bg-orange-100 text-orange-800 rounded-full font-medium">
+                        <span class="w-2 h-2 rounded-full bg-orange-500"></span> เริ่มสูง (25-30)
+                    </span>
+                    <span class="flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-800 rounded-full font-medium">
+                        <span class="w-2 h-2 rounded-full bg-red-500"></span> อันตราย (>30)
+                    </span>
+                </div>
                 <span class="text-xs text-gray-400">* ข้อมูลอัปเดตทุก 30 นาที</span>
             </div>
             <div class="relative h-[450px] w-full">
@@ -180,7 +189,6 @@
     <script>
         function toggleMenu() {
             const menu = document.getElementById('mobile-menu');
-            const menuIcon = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
         }
 
@@ -202,7 +210,6 @@
                 const d = new Date();
                 d.setDate(today.getDate() - i);
                 
-                // ใช้การดึงวันที่แบบท้องถิ่น YYYY-MM-DD เพื่อใช้เป็น Value ในการ Filter
                 const year = d.getFullYear();
                 const month = String(d.getMonth() + 1).padStart(2, '0');
                 const day = String(d.getDate()).padStart(2, '0');
@@ -231,7 +238,7 @@
             }
 
             try {
-                let url = ` https://smartpole.app.n8n.cloud/webhook/get-history?pole=${pole}&days=${range}`;
+                let url = `https://smartpole.app.n8n.cloud/webhook/get-history?pole=${pole}&days=${range}`;
                 
                 if (range !== "1" && selectedDate !== "all") {
                     url += `&date=${selectedDate}`;
@@ -245,7 +252,6 @@
                     return;
                 }
 
-                // --- แก้ไขการ Filter: ใช้ 10 ตัวแรกของสตริง (YYYY-MM-DD) เพื่อให้วันที่แม่นยำ ---
                 let filteredData = data;
                 if (range !== "1" && selectedDate !== "all") {
                     filteredData = data.filter(item => {
@@ -259,8 +265,13 @@
                     return;
                 }
 
-                // คำนวณค่าทางสถิติ (Design เดิม)
-                const pmValues = filteredData.map(item => Number(item.pm25 || item.PM25 || 0));
+                // ถ้าเป็นช่วง 7 หรือ 30 วัน และเลือกดูภาพรวม ให้จัดกลุ่มข้อมูลรายวัน
+                let processedData = filteredData;
+                if (range !== "1" && selectedDate === "all") {
+                    processedData = aggregateDataByDay(filteredData);
+                }
+
+                const pmValues = processedData.map(item => Number(item.pm25 || item.PM25 || 0));
                 const max = Math.max(...pmValues);
                 const min = Math.min(...pmValues);
                 const avg = (pmValues.reduce((a, b) => a + b, 0) / pmValues.length).toFixed(1);
@@ -269,7 +280,7 @@
                 document.getElementById('max-val').innerText = max;
                 document.getElementById('min-val').innerText = min;
 
-                renderChart(filteredData, pole, range, selectedDate);
+                renderChart(processedData, pole, range, selectedDate);
 
             } catch (error) {
                 console.error("Fetch Error:", error);
@@ -282,42 +293,72 @@
             }
         }
 
+        // ฟังก์ชันช่วยรวมข้อมูลเป็นรายวัน
+        function aggregateDataByDay(data) {
+            const grouped = {};
+            
+            data.forEach(item => {
+                const dateStr = item.created_at.substring(0, 10);
+                const val = Number(item.pm25 || item.PM25 || 0);
+                
+                if (!grouped[dateStr]) {
+                    grouped[dateStr] = {
+                        created_at: dateStr + "T00:00:00Z",
+                        sum: 0,
+                        count: 0
+                    };
+                }
+                
+                grouped[dateStr].sum += val;
+                grouped[dateStr].count += 1;
+            });
+            
+            return Object.keys(grouped).map(date => {
+                return {
+                    created_at: grouped[date].created_at,
+                    // ใช้ค่าเฉลี่ยของวันนั้นๆ เป็นตัวแทน
+                    pm25: (grouped[date].sum / grouped[date].count).toFixed(1)
+                };
+            }).sort((a, b) => a.created_at.localeCompare(b.created_at));
+        }
+
         function renderChart(data, pole, range, selectedDate) {
             const ctx = document.getElementById('chartHistory').getContext('2d');
             if (myChart) myChart.destroy();
 
-            // เรียงลำดับข้อมูลตามเวลา (จากเก่าไปใหม่)
-            data.sort((a, b) => a.created_at.localeCompare(b.created_at));
+            const pointColors = data.map(item => {
+                const val = Number(item.pm25 || item.PM25 || 0);
+                if (val > 30) return '#ef4444';
+                if (val >= 25) return '#f97316';
+                return '#22c55e';
+            });
 
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.map(item => {
-                        // --- แก้ไข Label: ดึงเลขจาก String ตรงๆ ไม่ผ่าน Date Object เพื่อป้องกันการบวก 7 ชม. ---
                         const rawStr = item.created_at; 
-                        const timePart = rawStr.includes('T') 
-                                        ? rawStr.split('T')[1].substring(0, 5) 
-                                        : rawStr.split(' ')[1].substring(0, 5);
                         
-                        if (selectedDate === "all" && range !== "1") {
-                            // ถ้าดูหลายวัน ให้โชว์วันที่ด้วย (ดึงจาก String 8-10 คือวัน, 5-7 คือเดือน)
-                            const day = parseInt(rawStr.substring(8, 10));
-                            const monthIndex = parseInt(rawStr.substring(5, 7)) - 1;
-                            const monthName = new Date(2000, monthIndex).toLocaleDateString('th-TH', {month:'short'});
-                            return `${day} ${monthName} ${timePart}`;
-                        }
-                        return timePart;
+                        // หากเป็นการดูข้อมูลรวมหลายวัน (7 วัน, 30 วัน) ให้แสดงเฉพาะ วัน/เดือน/ปี
+                        const year = rawStr.substring(0, 4);
+                        const monthIndex = parseInt(rawStr.substring(5, 7)) - 1;
+                        const day = parseInt(rawStr.substring(8, 10));
+                        const monthName = new Date(year, monthIndex).toLocaleDateString('th-TH', { month: 'short' });
+
+                        return `${day} ${monthName}`;
                     }),
                     datasets: [{
-                        label: `PM2.5 (${pole})`,
+                        label: `PM2.5 (${pole}) - ค่าเฉลี่ยรายวัน`,
                         data: data.map(item => Number(item.pm25 || item.PM25 || 0)),
-                        borderColor: '#2563eb', // สีน้ำเงินเดิม
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderColor: '#2563eb', 
+                        backgroundColor: 'rgba(37, 99, 235, 0.05)',
                         borderWidth: 3,
                         fill: true,
-                        tension: 0.4, // ความโค้งมนเดิม
-                        pointRadius: data.length > 50 ? 0 : 4,
-                        pointHoverRadius: 6
+                        tension: 0.3, 
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: pointColors, 
+                        pointBorderColor: pointColors
                     }]
                 },
                 options: {
@@ -332,7 +373,7 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return ` PM2.5: ${context.parsed.y} µg/m³`;
+                                    return ` ค่าเฉลี่ย: ${context.parsed.y} µg/m³`;
                                 }
                             }
                         }
@@ -341,18 +382,21 @@
                         y: { 
                             beginAtZero: true, 
                             title: { display: true, text: 'ค่าฝุ่น (µg/m³)', font: { weight: 'bold' } },
-                            grid: { color: '#f1f5f9' }
+                            grid: { color: '#f1f5f9' },
+                            suggestedMax: 45
                         },
                         x: { 
                             grid: { display: false }, 
-                            ticks: { maxRotation: 45, font: { size: 10 } } 
+                            ticks: { 
+                                maxRotation: 45, 
+                                font: { size: 10 } 
+                            } 
                         }
                     }
                 }
             });
         }
 
-        // เรียกใช้งานครั้งแรก
         window.onload = updateDateOptions;
     </script>
 </body>
